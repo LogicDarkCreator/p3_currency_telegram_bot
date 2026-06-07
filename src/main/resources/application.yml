@@ -1,7 +1,5 @@
 telegram:
   bot:
-#    не вписывайте данные, так как можете отправить в публичный репозиторий
-#    используйте переменные среды для установки значений
     username: ${BOT_NAME}
     token: ${BOT_TOKEN}
     notify:
@@ -13,9 +11,32 @@ binance:
   api:
     getPrice: https://api.binance.com/api/v3/avgPrice?symbol=BTCUSDT
 
+spring:
+  datasource:
+    url: ${db.url:jdbc:postgresql://localhost:5432/db}
+    username: ${db.user:root}
+    password: ${db.password:root}
+    driver-class-name: ${db.driver.name:org.postgresql.Driver}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: false
+
 db:
   driver:
     name: org.postgresql.Driver
   url: jdbc:postgresql://localhost:5432/db
   user: root
   password: root
+
+scheduler:
+  price-check:
+    fixed-delay: 120000
+
+notification:
+  cooldown:
+    minutes: 10

@@ -2,8 +2,8 @@ package com.skillbox.cryptobot.service;
 
 import com.skillbox.cryptobot.client.BinanceClient;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -19,8 +19,19 @@ public class CryptoCurrencyService {
 
     public double getBitcoinPrice() throws IOException {
         if (price.get() == null) {
-            price.set(client.getBitcoinPrice());
+            refreshPrice();
         }
         return price.get();
+    }
+
+    @Scheduled(fixedDelayString = "${scheduler.price-check.fixed-delay:120000}")
+    public void refreshPrice() {
+        try {
+            double newPrice = client.getBitcoinPrice();
+            price.set(newPrice);
+            log.info("Price refreshed: {} USD", newPrice);
+        } catch (IOException e) {
+            log.error("Error refreshing bitcoin price", e);
+        }
     }
 }
